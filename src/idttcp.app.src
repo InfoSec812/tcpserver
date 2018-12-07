@@ -1,0 +1,10 @@
+%% -*- mode: Erlang;-*-
+{application, idttcp,
+  [
+    {description, ""},
+    {vsn, "1"},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {mod, {idttcp_app, []}},
+    {env, []}
+  ]}.
