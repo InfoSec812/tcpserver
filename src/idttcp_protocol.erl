@@ -11,16 +11,38 @@ start_link(Ref, _Socket, Transport, Opts) ->
 init(Ref, Transport, _Opts = []) ->
   {ok, Socket} = ranch:handshake(Ref),
   lager:log(info, self(), "TCP conn established"),
-  loop(Socket, Transport).
+  loop(Socket, Transport, queue:new()).
 
-loop(Socket, Transport) ->
-  case Transport:recv(Socket, 0, 60000) of
-    {ok, <<"exit\r\n">>} ->
+loop(Socket, Transport, Queue) ->
+  case process_input(Transport:recv(Socket, 0, 600000)) of
+    <<"exit">> ->
       lager:log(info, self(), "TCP conn terminated"),
       ok = Transport:close(Socket);
-    {ok, Data} when Data =/= <<4>> ->
-      Transport:send(Socket, Data),
-      loop(Socket, Transport);
+
+    <<"in ", Payload/binary>> ->
+      Transport:send(Socket, <<Payload/binary, "\n">>),
+      loop(Socket, Transport, queue:in(Payload, Queue));
+
+    <<"out">> ->
+
+      {Item, NewQueue} = queue:out(Queue),
+
+      Response = case Item of
+        {value, Val} ->
+          Val;
+        _ ->
+          <<"empty\n">>
+      end,
+      Transport:send(Socket, <<Response/binary, "\n">>),
+      loop(Socket, Transport, NewQueue);
+    error ->
+      Transport:close(Socket);
     _ ->
-      ok = Transport:close(Socket)
+      Transport:send(Socket, <<"Unknown command. Use: 'in *Payload*' to insert | 'out' to read | 'exit'\n">>),
+      loop(Socket, Transport, Queue)
   end.
+
+process_input({ok, Data}) ->
+  binary:replace(Data,[<<"\n">>,<<"\r">>],<<"">>, [global]);
+process_input(_) ->
+  error.
