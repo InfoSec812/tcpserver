@@ -1,14 +1,4 @@
-%%%-------------------------------------------------------------------
-%%% @author kostik
-%%% @copyright (C) 2018, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 07. Dec 2018 15.51
-%%%-------------------------------------------------------------------
 -module(idttcp).
-
--author("konstantin.shamko").
 
 %% API
 -export([
@@ -18,26 +8,31 @@
 
 -define(APPS, [lager, ranch, idttcp]).
 
-%% ===================================================================
 %% API functions
-%% ===================================================================
+
 start() ->
   ok = ensure_started(?APPS).
+
 
 stop() ->
   ok = stop_apps(lists:reverse(?APPS)).
 
-%% ===================================================================
+
 %% Internal functions
-%% ===================================================================
-ensure_started([]) -> ok;
+
+ensure_started([]) ->
+  ok;
+
 ensure_started([App | Apps]) ->
   case application:ensure_all_started(App) of
     {ok, _} -> ensure_started(Apps);
     {error, {already_started, App}} -> ensure_started(Apps)
   end.
 
-stop_apps([]) -> ok;
+
+stop_apps([]) ->
+  ok;
+
 stop_apps([App | Apps]) ->
   application:stop(App),
   stop_apps(Apps).
