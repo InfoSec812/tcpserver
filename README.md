@@ -12,7 +12,7 @@
 ## Build & Run
 
 
-**rebar3** is required do run things. Verified on Erlang/OTP 21
+**rebar3** is required to run things. Verified on Erlang/OTP 21
 
 ```bash
 $ make compile-all
@@ -25,5 +25,14 @@ TCP server should be started on port 5555
 
 [ranch](https://github.com/ninenines/ranch) was used to handle TCP server calls and "queue" protocol
 
+## Unit Tests
+
+To run unit test run
+```bash
+$ make eunit
+```
+
 ## Known Issues
 * App parameters like port or connections timeout are hardcoded. 
+* Fix dialyzer warnings
+

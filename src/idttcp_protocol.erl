@@ -1,8 +1,12 @@
 -module(idttcp_protocol).
 -behaviour(ranch_protocol).
 
--export([start_link/4]).
--export([init/3]).
+-ifdef(EUNIT).
+  -compile(export_all).
+-else.
+  -export([start_link/4]).
+  -export([init/3]).
+-endif.
 
 -type idt_queue() :: {[binary()],[binary()]}.
 
