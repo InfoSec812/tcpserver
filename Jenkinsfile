@@ -16,7 +16,7 @@ pipeline {
       steps {
         script {
           openshift.withCluster() {
-            openshift.withProject(ciProject) {
+            openshift.withProject('labs-ci-cd') {
               openshift.selector('bc', 'erlang-app').startBuild("--from-file=_build/default/rel/idttcp/idttcp-0.0.1.tar.gz", '--wait')
             }
           }
